@@ -13,7 +13,7 @@ import {
 import { redirect } from "next/navigation"
 
 
-export function SignInError() {
+export default function SignInError() {
     const redirectToHome = () => {
         redirect("/");
     }
@@ -36,5 +36,3 @@ export function SignInError() {
         </div>
     )
 }
-
-export default SignInError

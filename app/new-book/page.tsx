@@ -84,7 +84,7 @@ const PAGE = () => {
                 description: state.message,
             });
         }
-    }, [state]);
+    }, [state, status]);
 
     if (authorizationStatus === "loading") {
         return (

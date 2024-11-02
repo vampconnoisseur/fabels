@@ -3,17 +3,17 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Modal from "@/app/components/Modal";
 import CheckoutButton from "@/app/components/CheckoutButton";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 const CheckoutPage = async () => {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user || !session.user.email) {
         return redirect("/");
     }
 
-    const cart = await fetchCartByEmail(session?.user?.email!);
+    const cart = await fetchCartByEmail(session.user.email);
 
     if (!cart || !Array.isArray(cart.books) || cart.books.length === 0) {
         return (
@@ -47,7 +47,7 @@ const CheckoutPage = async () => {
                         <h2 className="text-2xl font-bold text-black">Total Price</h2>
                         <p className="text-lg font-semibold text-green-600">${totalPrice.toFixed(2)}</p>
                     </div>
-                    <CheckoutButton userEmail={session?.user?.email!} />
+                    <CheckoutButton userEmail={session.user.email} />
                 </div>
             </ScrollArea>
         </Modal>

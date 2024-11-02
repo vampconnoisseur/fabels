@@ -2,9 +2,7 @@
 
 import React from "react";
 import { removeFromCart } from "@/app/lib/actions";
-import { redirect } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { revalidatePath } from "next/cache";
 
 
 interface RemoveFromCartButtonProps {

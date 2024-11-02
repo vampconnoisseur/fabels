@@ -11,7 +11,7 @@ const VerifyRequest = () => {
                 <h1 className="text-2xl font-semibold text-gray-800 mb-4">Check Your Email</h1>
 
                 <p className="text-gray-600 mb-6">
-                    We've sent a link to your email address. Click the link in the email to complete your sign-in.
+                    We&apos;ve sent a link to your email address. Click the link in the email to complete your sign-in.
                 </p>
 
                 <Link href="/">
@@ -21,7 +21,7 @@ const VerifyRequest = () => {
                 </Link>
 
                 <div className="mt-4 text-gray-500 text-sm">
-                    <p>Didn't receive an email? Please check your spam folder or <Link href="/" className="text-blue-500 hover:underline">resend the link</Link>.</p>
+                    <p>Didn&apos;t receive an email? Please check your spam folder or <Link href="/" className="text-blue-500 hover:underline">resend the link</Link>.</p>
                 </div>
             </div>
         </div>

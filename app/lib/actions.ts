@@ -76,7 +76,7 @@ export async function checkout(userEmail: string): Promise<{ url: string | null 
             data: { bookIds: [] },
         });
 
-        let resend = new Resend(process.env.EMAIL_SERVER_PASSWORD)
+        const resend = new Resend(process.env.EMAIL_SERVER_PASSWORD)
         await resend.emails.send({
             from: process.env.EMAIL_FROM!,
             to: userEmail,
@@ -139,7 +139,7 @@ export async function addToCart(userEmail: string, bookId: string) {
     }
 }
 
-export const addBook = async (prevState: any, formData: FormData): Promise<{ message: string }> => {
+export const addBook = async (prevState: unknown, formData: FormData): Promise<{ message: string }> => {
     const BookDataSchema = z.object({
         thumbnail: z.string().min(1, "Thumbnail is required."),
         title: z.string().min(1, "Title is required."),
@@ -182,7 +182,7 @@ export const addBook = async (prevState: any, formData: FormData): Promise<{ mes
     }
 };
 
-export const updateBook = async (prevState: any, formData: FormData): Promise<{ message: string }> => {
+export const updateBook = async (prevState: unknown, formData: FormData): Promise<{ message: string }> => {
     const BookDataSchema = z.object({
         thumbnail: z.string().min(1, "Thumbnail is required."),
         title: z.string().min(1, "Title is required."),

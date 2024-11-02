@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { authOptions } from "@/app/lib/auth";
 import { redirect } from 'next/navigation';
 import { fetchUserByEmail } from '@/app/lib/data';
 import RatingComponent from '../components/RatingComponent';
@@ -8,12 +8,14 @@ import RatingComponent from '../components/RatingComponent';
 const PurchasedBooks = async () => {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
-        redirect("/");
-    }
-
     try {
-        const user = await fetchUserByEmail(session?.user?.email!);
+        if (!session || !session.user || !session.user.email) {
+            return redirect("/");
+        }
+
+        const userEmail = session.user.email;
+        const user = await fetchUserByEmail(userEmail);
+
         const purchasedBooks = user?.purchasedBooks || [];
 
         if (purchasedBooks.length === 0) {
@@ -51,7 +53,7 @@ const PurchasedBooks = async () => {
                                         <div className="m-4">
                                             <RatingComponent
                                                 bookId={book.id}
-                                                userEmail={session?.user?.email!}
+                                                userEmail={userEmail}
                                                 userRating={userRating}
                                             />
                                         </div>
@@ -63,14 +65,18 @@ const PurchasedBooks = async () => {
                 </div>
             </div>
         );
-    } catch (error) {
-        return (
-            <div className="p-4">
-                <h1 className="text-xl font-bold">Error</h1>
-                <p>Failed to load your purchased books. Please try again later.</p>
-            </div>
-        );
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return (
+                <div className="p-4">
+                    <h1 className="text-xl font-bold">Error</h1>
+                    <p>Failed to load your purchased books. Please try again later.</p>
+                </div>
+            );
+        }
     }
 };
+
 
 export default PurchasedBooks;

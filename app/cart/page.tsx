@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { fetchCartByEmail } from '@/app/lib/data';
-import { authOptions } from '../api/auth/[...nextauth]/route';
 import RemoveFromCartButton from "@/app/components/RemoveFromCartButton";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { authOptions } from '../lib/auth';
 
 const CartPage = async () => {
     const session = await getServerSession(authOptions);
@@ -13,7 +13,9 @@ const CartPage = async () => {
         return redirect("/");
     }
 
-    const cart = await fetchCartByEmail(session?.user?.email!);
+    const email = session.user?.email;
+
+    const cart = await fetchCartByEmail(email!);
 
     if (!cart || !Array.isArray(cart.books) || cart.books.length === 0) {
         return (
@@ -37,7 +39,7 @@ const CartPage = async () => {
                                 <p className="text-3xl font-semibold text-gray-800">{book.title}</p>
                                 <p className="text-2xl text-gray-600">Price: <span className="font-bold">${book.price.toFixed(2)}</span></p>
                             </div>
-                            <RemoveFromCartButton bookId={book.id} userEmail={session?.user?.email!} />
+                            <RemoveFromCartButton bookId={book.id} userEmail={email!} />
                         </li>
                     ))}
                 </ul>

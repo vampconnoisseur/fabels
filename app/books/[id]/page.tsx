@@ -1,15 +1,20 @@
 import { fetchBook, fetchUserByEmail } from "@/app/lib/data";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import RatingComponent from "@/app/components/RatingComponent";
+import { redirect } from "next/navigation";
 
 export default async function PAGE({ params }: { params: Promise<{ id: string }> }) {
     const id = (await params).id;
 
     const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.email) {
+        return redirect("/");
+    }
 
     try {
         const book = await fetchBook(id);
@@ -18,8 +23,8 @@ export default async function PAGE({ params }: { params: Promise<{ id: string }>
         let userRating: number | null = null;
 
 
-        if (session) {
-            const user = await fetchUserByEmail(session?.user?.email!);
+        if (session && session.user && session.user.email) {
+            const user = await fetchUserByEmail(session.user.email);
             isAdmin = user?.isAdmin;
             isPurchased = user?.purchasedBooks.some(b => b.id === book.id);
 
@@ -56,12 +61,12 @@ export default async function PAGE({ params }: { params: Promise<{ id: string }>
                                         </Link>
                                         <RatingComponent
                                             bookId={book.id}
-                                            userEmail={session?.user?.email!}
+                                            userEmail={session.user.email}
                                             userRating={userRating}
                                         />
                                     </div>
                                 ) : (
-                                    <AddToCartButton bookId={book.id} userEmail={session?.user?.email!} />
+                                    <AddToCartButton bookId={book.id} userEmail={session.user.email} />
                                 )
                             ))}
                     </div>
@@ -69,10 +74,12 @@ export default async function PAGE({ params }: { params: Promise<{ id: string }>
             </div>
         );
     } catch (error) {
-        return (
-            <div>
-                <h1>Error fetching book.</h1>
-            </div>
-        );
+        if (error instanceof Error) {
+            return (
+                <div>
+                    <h1>Error fetching book.</h1>
+                </div>
+            );
+        }
     }
 }

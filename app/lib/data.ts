@@ -125,6 +125,17 @@ export async function fetchBook(bookId: string): Promise<Book> {
   }
 }
 
+interface SalesData {
+  [bookId: string]: SalesDataEntry;
+}
+
+interface SalesDataEntry {
+  title: string;
+  sales: number;
+  price: number;
+  averageRating: number | null;
+}
+
 export const fetchBookSales = async (): Promise<SalesData> => {
   const transactions = await prisma.transaction.findMany({
     include: {

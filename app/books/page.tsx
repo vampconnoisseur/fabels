@@ -21,10 +21,12 @@ const PAGE = () => {
     const [sortOption, setSortOption] = useState<string>("");
     const [loading, setLoading] = useState(true);
 
+
+
     useEffect(() => {
         const initializeData = async () => {
             try {
-                if (sessionData?.user?.email) {
+                if (sessionData && sessionData.user && sessionData.user.email) {
                     const user = await fetchUserByEmail(sessionData.user.email);
                     setIsAdmin(user!.isAdmin);
 
@@ -175,7 +177,9 @@ const PAGE = () => {
                                             </Link>
                                         ) : (
                                             <div className="m-4">
-                                                <AddToCartButton bookId={book.id} userEmail={sessionData?.user?.email!} />
+                                                {sessionData?.user?.email && (
+                                                    <AddToCartButton bookId={book.id} userEmail={sessionData.user.email} />
+                                                )}
                                             </div>
                                         ) :
                                         sessionData ?

@@ -5,7 +5,7 @@ import { updateBook } from "@/app/lib/actions";
 import { useFormStatus } from "react-dom";
 import React from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,17 +35,25 @@ const SubmitButton = () => {
 };
 
 const PAGE = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const { toast } = useToast();
+    const router = useRouter();
     const id = use(params).id;
 
     const [formState, formAction] = useActionState(updateBook, initialState);
-    const [book, setBook] = useState<any>(null);
+    const [book, setBook] = useState<Book | null>(null);
     const [tags, setTags] = useState<string[]>([""]);
     const [authors, setAuthors] = useState<string[]>([""]);
     const [authorizationStatus, setAuthorizationStatus] = useState<"loading" | "unauthorized" | "authorized">("loading");
 
     useEffect(() => {
+        if (status === "loading") return;
+
+        if (!session) {
+            router.push("/");
+            return;
+        }
+
         const checkAdminStatus = async () => {
             if (session?.user?.email) {
                 try {
@@ -69,7 +77,7 @@ const PAGE = ({ params }: { params: Promise<{ id: string }> }) => {
         };
 
         checkAdminStatus();
-    }, [session, toast]);
+    }, [session, router, status]);
 
     useEffect(() => {
         const loadBook = async () => {
@@ -81,7 +89,7 @@ const PAGE = ({ params }: { params: Promise<{ id: string }> }) => {
         };
 
         loadBook();
-    }, [id]);
+    }, [id, params, router, status]);
 
     useEffect(() => {
         if (formState && formState.message) {
@@ -90,7 +98,7 @@ const PAGE = ({ params }: { params: Promise<{ id: string }> }) => {
                 description: formState.message,
             });
         }
-    }, [formState]);
+    }, [formState, toast]);
 
     if (authorizationStatus === "loading" || !book) {
         return (

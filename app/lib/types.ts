@@ -14,17 +14,6 @@ type Book = {
     averageRating: number;
 };
 
-interface SalesDataEntry {
-    title: string;
-    sales: number;
-    price: number;
-    averageRating: number | null;
-}
-
-interface SalesData {
-    [bookId: string]: SalesDataEntry;
-}
-
 type User = {
     id: string;
     name?: string | null;
@@ -72,12 +61,6 @@ type Session = {
     userId: string;
     expires: Date;
     user: User;              // Relation to the associated user
-};
-
-type VerificationToken = {
-    identifier: string;
-    token: string;
-    expires: Date;
 };
 
 type Cart = {

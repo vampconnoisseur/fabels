@@ -11,15 +11,19 @@ import { redirect } from 'next/navigation';
 
 Chart.register(CategoryScale, LinearScale, ArcElement, BarElement, Title, Legend, Tooltip);
 
+interface SalesData {
+    [bookId: string]: SalesDataEntry;
+}
+
 interface SalesDataEntry {
     title: string;
     sales: number;
     price: number;
-    averageRating: number;
+    averageRating: number | null;
 }
 
-interface SalesData {
-    [bookId: string]: SalesDataEntry;
+interface CustomChartData extends ChartData<'bar' | 'pie', (number | null)[], unknown> {
+    datasets: ChartDataset[];
 }
 
 interface ChartDataset {
@@ -28,10 +32,6 @@ interface ChartDataset {
     backgroundColor: string | string[];
     borderColor: string;
     borderWidth: number;
-}
-
-interface CustomChartData extends ChartData<'bar' | 'pie', (number | null)[], unknown> {
-    datasets: ChartDataset[];
 }
 
 const SalesPage = () => {
@@ -74,7 +74,7 @@ const SalesPage = () => {
         };
 
         checkAdminStatus();
-    }, [session, toast]);
+    }, [status, session]);
 
     useEffect(() => {
         if (authorizationStatus === "authorized" && Object.keys(salesData).length > 0) {

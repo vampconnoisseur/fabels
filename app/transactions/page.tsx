@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { fetchTransactions, fetchTransactionsByUserEmail, fetchUserByEmail } from '@/app/lib/data';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { authOptions } from '../lib/auth';
+
 
 const TransactionsPage = async () => {
     const session = await getServerSession(authOptions);
@@ -10,10 +11,18 @@ const TransactionsPage = async () => {
         return redirect("/");
     }
 
-    const user = await fetchUserByEmail(session?.user?.email!);
+    const userEmail = session.user?.email;
+
+    if (!userEmail) {
+        return redirect("/");
+    }
+
+    const user = await fetchUserByEmail(userEmail);
+
+    // Ensure user is defined before accessing properties
     const transactions = user?.isAdmin
         ? await fetchTransactions()
-        : await fetchTransactionsByUserEmail(user?.email!);
+        : await fetchTransactionsByUserEmail(user?.email || "");
 
     transactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 

@@ -31,11 +31,13 @@ export function SignInComponent() {
                 setLoading(false);
             }, 1500);
         } catch (error) {
-            setLoading(false);
-            toast({
-                title: "Error",
-                description: "There was an issue sending the email. Please try again.",
-            });
+            if (error instanceof Error) {
+                setLoading(false);
+                toast({
+                    title: "Error",
+                    description: error.message,
+                });
+            }
         }
     };
 

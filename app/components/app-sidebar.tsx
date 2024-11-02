@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ArrowRightLeft, BadgeDollarSign, Book, BookA, ChevronUp, Plus, ShoppingCart, User2 } from "lucide-react";
+import { ArrowRightLeft, BadgeDollarSign, Book, BookA, ChevronUp, Plus, ShoppingCart, User } from "lucide-react";
 import {
     Sidebar,
     SidebarContent,
@@ -116,8 +116,8 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton>
-                                    <User2 /> {(status === "loading") ? userName : session ? userName : "Login"}
+                                <SidebarMenuButton className="font-medium">
+                                    <User /> {(status === "loading") ? userName : session ? userName : "Login"}
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
@@ -126,7 +126,7 @@ export function AppSidebar() {
                                 className="w-[--radix-popper-anchor-width] mb-2 p-2 rounded-md bg-gray-300"
                             >
                                 <button className="w-full flex" onClick={() => (session ? signOut() : redirectToHome())}>
-                                    <DropdownMenuItem className="text-black text-semibold px-2 text-sm">
+                                    <DropdownMenuItem className="text-black font-medium text-semibold px-2 text-sm">
                                         {session ? "Sign Out" : "Sign In"}
                                     </DropdownMenuItem>
                                 </button>

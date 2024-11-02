@@ -6,7 +6,6 @@ import Link from 'next/link';
 import AddToCartButton from "@/app/components/AddToCartButton";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
-import { Toggle } from "@/components/ui/toggle"
 import StarRating from "../components/StarRating";
 
 const PAGE = () => {
@@ -17,21 +16,20 @@ const PAGE = () => {
     const [userRatings, setUserRatings] = useState<Record<string, number>>({});
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sortOption, setSortOption] = useState<string>("");
-    const [loading, setLoading] = useState(true);
-
-
+    const [purchasedBooksLoaded, setpurchasedBooksLoaded] = useState(false);
 
     useEffect(() => {
         const initializeData = async () => {
             try {
                 if (sessionData && sessionData.user && sessionData.user.email) {
                     const user = await fetchUserByEmail(sessionData.user.email);
-                    setIsAdmin(user!.isAdmin);
 
                     const purchasedBookIds = new Set(user?.purchasedBooks?.map(book => book.id) || []);
                     setPurchasedBookIds(purchasedBookIds);
+                    setpurchasedBooksLoaded(true);
+
+                    setIsAdmin(user!.isAdmin);
 
                     const ratings = user?.purchasedBooks?.reduce((acc: Record<string, number>, book) => {
                         const bookRating = book.ratings.find(r => r.userId === user.id);
@@ -47,8 +45,6 @@ const PAGE = () => {
                 setBooks(allBooks);
             } catch (error) {
                 console.error("Error fetching data:", error);
-            } finally {
-                setLoading(false);
             }
         };
 
@@ -68,12 +64,6 @@ const PAGE = () => {
             );
         }
 
-        if (selectedTags.length > 0) {
-            result = result.filter(book =>
-                selectedTags.every(tag => book.tags.includes(tag))
-            );
-        }
-
         if (sortOption) {
             result = [...result].sort((a, b) => {
                 if (sortOption === "priceAsc") {
@@ -84,63 +74,44 @@ const PAGE = () => {
                     return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime();
                 } else if (sortOption === "releaseDateDesc") {
                     return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
-                } else if (sortOption === "rating") {
-                    return (userRatings[b.id] || 0) - (userRatings[a.id] || 0);
+                } else if (sortOption === "ratingAsc") {
+                    return a.averageRating - b.averageRating;
+                } else if (sortOption === "ratingDesc") {
+                    return b.averageRating - a.averageRating;
                 }
                 return 0;
             });
         }
 
         setFilteredBooks(result);
-    }, [books, searchTerm, selectedTags, sortOption, userRatings]);
-
-    const handleTagSelection = (tag: string) => {
-        setSelectedTags(prevTags =>
-            prevTags.includes(tag) ? prevTags.filter(t => t !== tag) : [...prevTags, tag]
-        );
-    };
+    }, [books, searchTerm, sortOption, userRatings]);
 
     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => setSortOption(e.target.value);
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
     return (
         <>
-            {loading || status === "loading" ? (
-                <div className="flex min-h-screen justify-center items-center">
-                    <div className="loader"></div>
+            <div className="mt-8 ml-8">
+                <div className="flex gap-4 mb-6">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Search books..."
+                        className="p-2 border border-gray-300 rounded"
+                    />
+                    <select onChange={handleSortChange} className="p-2 border border-gray-300 rounded">
+                        <option value="">Sort By</option>
+                        <option value="priceAsc">Price: Low to High</option>
+                        <option value="priceDesc">Price: High to Low</option>
+                        <option value="releaseDateAsc">Release Date: Oldest to Newest</option>
+                        <option value="releaseDateDesc">Release Date: Newest to Oldest</option>
+                        <option value="ratingAsc">Rating: Low to High</option>
+                        <option value="ratingDesc">Rating: High to Low</option>
+                    </select>
                 </div>
-            ) : (
-                <div className="mt-8 ml-8">
-                    <div className="flex gap-4 mb-6">
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            placeholder="Search books..."
-                            className="p-2 border border-gray-300 rounded"
-                        />
-                        <select onChange={handleSortChange} className="p-2 border border-gray-300 rounded">
-                            <option value="">Sort By</option>
-                            <option value="priceAsc">Price: Low to High</option>
-                            <option value="priceDesc">Price: High to Low</option>
-                            <option value="releaseDateAsc">Release Date: Oldest to Newest</option>
-                            <option value="releaseDateDesc">Release Date: Newest to Oldest</option>
-                            <option value="rating">Rating</option>
-                        </select>
-                        {["classic", "romance", "social commentary"].map(tag => (
-                            <Toggle
-                                variant="outline"
-                                size="lg"
-                                key={tag}
-                                onClick={() => handleTagSelection(tag)}
-                            >
-                                {tag}
-                            </Toggle>
-                        ))}
-                    </div>
-                </div>
-            )}
-            {!loading && status !== "loading" && (
+            </div>
+            {status !== "loading" ? (
                 <div className="flex justify-center">
                     <div className="max-w-7xl p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -166,12 +137,12 @@ const PAGE = () => {
                                             <StarRating rating={book.averageRating} />
                                         </div>
                                     </div>
-                                    {(isAdmin || purchasedBookIds.size > 0) ?
-                                        isAdmin ? (
+                                    {sessionData ? (purchasedBooksLoaded) ? (isAdmin)
+                                        ? (
                                             <Link href={`/update-book/${book.id}`}>
                                                 <Button className="m-4">Update</Button>
                                             </Link>
-                                        ) : purchasedBookIds.has(book.id) ? (
+                                        ) : (purchasedBookIds.has(book.id)) ? (
                                             <Link href={`/read/${book.id}`}>
                                                 <Button className="m-4">Read</Button>
                                             </Link>
@@ -181,20 +152,22 @@ const PAGE = () => {
                                                     <AddToCartButton bookId={book.id} userEmail={sessionData.user.email} />
                                                 )}
                                             </div>
-                                        ) :
-                                        sessionData ?
-                                            <div className="ml-4 mb-4">
-                                                <div className="loader"></div>
-                                            </div>
-                                            :
-                                            null
+                                        )
+                                        : <div className="ml-4 mb-4">
+                                            <div className="loader"></div>
+                                        </div>
+                                        : null
                                     }
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
-            )}
+            ) :
+                <div className="flex flex-col min-h-screen justify-center items-center">
+                    <div className="loader"></div>
+                </div>
+            }
         </>
     );
 };

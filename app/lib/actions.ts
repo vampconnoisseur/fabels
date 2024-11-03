@@ -40,8 +40,8 @@ export async function checkout(userEmail: string): Promise<{ url: string | null 
             payment_method_types: ['card'],
             line_items: [{ price: price.id, quantity: 1 }],
             mode: 'payment',
-            success_url: `https://${process.env.VERCEL_URL}/books`,
-            cancel_url: `https://${process.env.VERCEL_URL}/books`,
+            success_url: `https://${process.env.VERCEL_BRANCH_URL}/books`,
+            cancel_url: `https://${process.env.VERCEL_BRANCH_URL}/books`,
             metadata: { userEmail, cartId: cart.id },
         });
 

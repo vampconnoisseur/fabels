@@ -75,7 +75,8 @@ const PAGE = () => {
           book.authors.some((author) =>
             author.toLowerCase().includes(searchTerm.toLowerCase())
           ) ||
-          book.publisher.toLowerCase().includes(searchTerm.toLowerCase())
+          book.publisher.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          book.genre.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -150,7 +151,7 @@ const PAGE = () => {
                   {filteredBooks.map((book) => (
                     <div
                       key={book.id}
-                      className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 relative flex flex-col justify-between"
+                      className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 relative flex flex-col justify-between min-w-[400px]"
                     >
                       <Link href={`/books/${book.id}`}>
                         <div className="relative">

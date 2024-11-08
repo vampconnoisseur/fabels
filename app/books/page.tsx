@@ -142,95 +142,99 @@ const PAGE = () => {
           </select>
         </div>
       </div>
-      {status !== "loading" ?
-        (
-          <div className="flex justify-center">
-            <div className="max-w-7xl p-4">
-              {filteredBooks.length > 0 ?
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredBooks.map((book) => (
-                    <div
-                      key={book.id}
-                      className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 relative flex flex-col justify-between min-w-[400px]"
-                    >
-                      <Link href={`/books/${book.id}`}>
-                        <div className="relative">
-                          <img
-                            src={book.thumbnail}
-                            alt={book.title}
-                            className="w-full h-80 object-cover"
-                          />
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                            <h2 className="text-xl font-bold text-white">
-                              {book.title}
-                            </h2>
-                            <p className="text-gray-300">{book.description}</p>
-                          </div>
-                        </div>
-                      </Link>
-                      <div className="p-4">
-                        <p className="text-gray-700">
-                          Price:{" "}
-                          <span className="font-semibold">
-                            ${book.price.toFixed(2)}
-                          </span>
-                        </p>
-                        <p className="text-gray-700">
-                          Release Date:{" "}
-                          <span className="font-semibold">
-                            {new Date(book.releaseDate).toLocaleDateString()}
-                          </span>
-                        </p>
-                        <p className="text-gray-700">Genre: {book.genre}</p>
-                        <p className="text-gray-700">
-                          Tags: {book.tags.join(", ")}
-                        </p>
-                        <p className="text-gray-700">Publisher: {book.publisher}</p>
-                        <p className="text-gray-700">
-                          Authors: {book.authors.join(", ")}
-                        </p>
-                        <div className="absolute top-4 right-4">
-                          <StarRating rating={book.averageRating} />
+      {status !== "loading" ? (
+        <div className="flex justify-center">
+          <div className="max-w-7xl p-4">
+            {filteredBooks.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredBooks.map((book) => (
+                  <div
+                    key={book.id}
+                    className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 relative flex flex-col justify-between sm:min-w-[450px] md:min-w-[200px] lg:min-w-[300px] xl:min-w-[300px]"
+                  >
+                    <Link href={`/books/${book.id}`}>
+                      <div className="relative">
+                        <img
+                          src={book.thumbnail}
+                          alt={book.title}
+                          className="w-full h-80 object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                          <h2 className="text-xl font-bold text-white">
+                            {book.title}
+                          </h2>
+                          <p className="text-gray-300">{book.description}</p>
                         </div>
                       </div>
-                      {sessionData ? (
-                        purchasedBooksLoaded ? (
-                          isAdmin ? (
-                            <Link href={`/update-book/${book.id}`}>
-                              <Button className="m-4">Update</Button>
-                            </Link>
-                          ) : purchasedBookIds.has(book.id) ? (
-                            <Link href={`/read/${book.id}`}>
-                              <Button className="m-4">Read</Button>
-                            </Link>
-                          ) : (
-                            <div className="m-4">
-                              {sessionData?.user?.email && (
-                                <AddToCartButton
-                                  bookId={book.id}
-                                  userEmail={sessionData.user.email}
-                                />
-                              )}
-                            </div>
-                          )
+                    </Link>
+                    <div className="p-4">
+                      <p className="text-gray-700">
+                        Price:{" "}
+                        <span className="font-semibold">
+                          ${book.price.toFixed(2)}
+                        </span>
+                      </p>
+                      <p className="text-gray-700">
+                        Release Date:{" "}
+                        <span className="font-semibold">
+                          {new Date(book.releaseDate).toLocaleDateString()}
+                        </span>
+                      </p>
+                      <p className="text-gray-700">Genre: {book.genre}</p>
+                      <p className="text-gray-700">
+                        Tags: {book.tags.join(", ")}
+                      </p>
+                      <p className="text-gray-700">
+                        Publisher: {book.publisher}
+                      </p>
+                      <p className="text-gray-700">
+                        Authors: {book.authors.join(", ")}
+                      </p>
+                      <div className="absolute top-4 right-4">
+                        <StarRating rating={book.averageRating} />
+                      </div>
+                    </div>
+                    {sessionData ? (
+                      purchasedBooksLoaded ? (
+                        isAdmin ? (
+                          <Link href={`/update-book/${book.id}`}>
+                            <Button className="m-4">Update</Button>
+                          </Link>
+                        ) : purchasedBookIds.has(book.id) ? (
+                          <Link href={`/read/${book.id}`}>
+                            <Button className="m-4">Read</Button>
+                          </Link>
                         ) : (
-                          <div className="ml-4 mb-4">
-                            <div className="loader"></div>
+                          <div className="m-4">
+                            {sessionData?.user?.email && (
+                              <AddToCartButton
+                                bookId={book.id}
+                                userEmail={sessionData.user.email}
+                              />
+                            )}
                           </div>
                         )
-                      ) : null}
-                    </div>
-                  ))}
-                </div> :
-                <h1 className="flex flex-col min-h-screen justify-center items-center">No books to show.</h1>
-              }
-            </div>
+                      ) : (
+                        <div className="ml-4 mb-4">
+                          <div className="loader"></div>
+                        </div>
+                      )
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <h1 className="flex flex-col min-h-screen justify-center items-center">
+                No books to show.
+              </h1>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-col min-h-screen justify-center items-center">
-            <div className="loader"></div>
-          </div>
-        )}
+        </div>
+      ) : (
+        <div className="flex flex-col min-h-screen justify-center items-center">
+          <div className="loader"></div>
+        </div>
+      )}
     </>
   );
 };
